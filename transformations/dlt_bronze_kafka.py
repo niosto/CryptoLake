@@ -15,7 +15,9 @@
 
 # COMMAND ----------
 
+import os
 import dlt
+from dotenv import load_dotenv
 from pyspark.sql import functions as F
 from pyspark.sql.types import (
     DoubleType,
@@ -28,12 +30,14 @@ from pyspark.sql.types import (
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-# Inject via DLT pipeline config:  spark.cryptolake.kafka.bootstrap_servers
-KAFKA_BOOTSTRAP_SERVERS = spark.conf.get(
-    "spark.cryptolake.kafka.bootstrap_servers",
-    "localhost:9092",          # fallback for local interactive runs
+# Try to load from .env, fallback to DLT spark configurations
+load_dotenv()
+
+KAFKA_BOOTSTRAP_SERVERS = os.getenv(
+    "KAFKA_BOOTSTRAP_SERVERS",
+    spark.conf.get("spark.cryptolake.kafka.bootstrap_servers", "localhost:9092")
 )
-KAFKA_TOPIC = "crypto-prices"
+KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "crypto-prices")
 
 # ---------------------------------------------------------------------------
 # Schema emitted by the CoinLore producer (producer.py)
@@ -58,7 +62,8 @@ COINLORE_SCHEMA = StructType(
 # Bronze DLT table
 # ---------------------------------------------------------------------------
 @dlt.table(
-    name="bronze_crypto_prices",
+    name="crypto_prices",
+    schema="bronze",
     comment=(
         "Raw crypto-price events streamed from the crypto-prices Kafka topic. "
         "One row per coin per poll cycle (~30 s). Kafka metadata is preserved "
@@ -70,7 +75,7 @@ COINLORE_SCHEMA = StructType(
         "delta.enableChangeDataFeed":      "true",
     },
 )
-def bronze_crypto_prices():
+def crypto_prices():
     """
     Structured Streaming source: Kafka → Delta Live Table (append-only).
 

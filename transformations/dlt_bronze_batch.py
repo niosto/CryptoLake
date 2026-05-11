@@ -15,9 +15,11 @@
 
 # COMMAND ----------
 
+import os
 import dlt
 import requests
 import pandas as pd
+from dotenv import load_dotenv
 from pyspark.sql import functions as F
 from pyspark.sql.types import (
     DoubleType,
@@ -31,8 +33,10 @@ from pyspark.sql.types import (
 # ---------------------------------------------------------------------------
 # Configuration  (inject via DLT pipeline → Configuration tab)
 # ---------------------------------------------------------------------------
-COINGECKO_API_KEY = spark.conf.get("spark.cryptolake.coingecko.api_key", "")
-COINCAP_API_KEY   = spark.conf.get("spark.cryptolake.coincap.api_key",   "")
+load_dotenv()
+
+COINGECKO_API_KEY = os.getenv("COINGECKO_API_KEY", spark.conf.get("spark.cryptolake.coingecko.api_key", ""))
+COINCAP_API_KEY   = os.getenv("COINCAP_API_KEY", spark.conf.get("spark.cryptolake.coincap.api_key", ""))
 
 COINGECKO_LIMIT = 50
 COINCAP_LIMIT   = 50
@@ -99,7 +103,8 @@ def _fetch_coincap(api_key: str, limit: int) -> pd.DataFrame:
 # Bronze – CoinGecko
 # ---------------------------------------------------------------------------
 @dlt.table(
-    name="bronze_coingecko",
+    name="coingecko",
+    schema="bronze",
     comment=(
         "Top-50 coins snapshot from CoinGecko /coins/markets. "
         "One full snapshot per pipeline run; Delta time travel provides history."
@@ -112,7 +117,7 @@ def _fetch_coincap(api_key: str, limit: int) -> pd.DataFrame:
 )
 @dlt.expect("non_null_price",  "price_usd IS NOT NULL")
 @dlt.expect("non_null_symbol", "symbol IS NOT NULL")
-def bronze_coingecko():
+def coingecko():
     """
     Fetch CoinGecko /coins/markets and return a Spark DataFrame.
     DLT manages the Delta table; each run adds a new Delta version.
@@ -135,7 +140,8 @@ def bronze_coingecko():
 # Bronze – CoinCap
 # ---------------------------------------------------------------------------
 @dlt.table(
-    name="bronze_coincap",
+    name="coincap",
+    schema="bronze",
     comment=(
         "Top-50 coins snapshot from CoinCap /assets. "
         "One full snapshot per pipeline run; Delta time travel provides history."
@@ -148,7 +154,7 @@ def bronze_coingecko():
 )
 @dlt.expect("non_null_price",  "price_usd IS NOT NULL")
 @dlt.expect("non_null_symbol", "symbol IS NOT NULL")
-def bronze_coincap():
+def coincap():
     """
     Fetch CoinCap /assets and return a Spark DataFrame.
     DLT manages the Delta table; each run adds a new Delta version.

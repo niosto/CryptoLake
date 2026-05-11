@@ -18,7 +18,8 @@ from pyspark.sql import functions as F
 # Silver – joined and enriched
 # ---------------------------------------------------------------------------
 @dlt.table(
-    name="silver_crypto_enriched",
+    name="crypto_enriched",
+    schema="silver",
     comment=(
         "CoinGecko × CoinCap joined snapshot. "
         "Rows with invalid price or symbol are dropped. "
@@ -35,7 +36,7 @@ from pyspark.sql import functions as F
 @dlt.expect_or_drop("valid_symbol",     "symbol IS NOT NULL AND symbol != ''")
 @dlt.expect_or_drop("valid_market_cap", "market_cap IS NOT NULL AND market_cap > 0")
 @dlt.expect("non_negative_volume",      "volume_24h IS NULL OR volume_24h >= 0")
-def silver_crypto_enriched():
+def crypto_enriched():
     """
     Batch transformation: bronze_coingecko ⟕ bronze_coincap → silver_crypto_enriched.
 
@@ -54,14 +55,14 @@ def silver_crypto_enriched():
     """
     # ── Read both Bronze tables (batch, not streaming) ────────────────────────
     df_cg = (
-        dlt.read("bronze_coingecko")
+        dlt.read("coingecko")
            .withColumn("symbol_upper", F.upper(F.col("symbol")))
            # Drop rows missing the JOIN key or critical metrics
            .dropna(subset=["symbol", "price_usd", "market_cap", "volume_24h"])
     )
 
     df_cc = (
-        dlt.read("bronze_coincap")
+        dlt.read("coincap")
            .withColumn("symbol_upper", F.upper(F.col("symbol")))
            .dropna(subset=["symbol", "price_usd", "market_cap_usd", "volume_24h"])
            # Only bring the columns we need from CoinCap to avoid ambiguity
