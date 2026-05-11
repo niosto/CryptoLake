@@ -15,11 +15,10 @@
 
 # COMMAND ----------
 
-import os
 import dlt
+import config
 import requests
 import pandas as pd
-from dotenv import load_dotenv
 from pyspark.sql import functions as F
 from pyspark.sql.types import (
     DoubleType,
@@ -31,12 +30,10 @@ from pyspark.sql.types import (
 )
 
 # ---------------------------------------------------------------------------
-# Configuration  (inject via DLT pipeline → Configuration tab)
+# Configuration  (inject via DLT pipeline → Configuration tab or config.py)
 # ---------------------------------------------------------------------------
-load_dotenv()
-
-COINGECKO_API_KEY = os.getenv("COINGECKO_API_KEY", spark.conf.get("spark.cryptolake.coingecko.api_key", ""))
-COINCAP_API_KEY   = os.getenv("COINCAP_API_KEY", spark.conf.get("spark.cryptolake.coincap.api_key", ""))
+COINGECKO_API_KEY = spark.conf.get("spark.cryptolake.coingecko.api_key", config.COINGECKO_API_KEY)
+COINCAP_API_KEY   = spark.conf.get("spark.cryptolake.coincap.api_key", config.COINCAP_API_KEY)
 
 COINGECKO_LIMIT = 50
 COINCAP_LIMIT   = 50

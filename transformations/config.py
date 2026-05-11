@@ -1,0 +1,8 @@
+# config.py
+# Contains credentials and configurations for DLT pipelines.
+# DO NOT COMMIT THIS FILE TO VERSION CONTROL.
+
+COINGECKO_API_KEY = "CG-niPKE3kRnCDCXSzgXRdYErCA"
+COINCAP_API_KEY = "622f77f63bf310d7ca3f614089477c59c8bc690d4b2007ffb48d3c458e0ea089"
+KAFKA_BOOTSTRAP_SERVERS = "98.82.132.115:9092"
+KAFKA_TOPIC = "crypto-prices"

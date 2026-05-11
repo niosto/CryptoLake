@@ -15,9 +15,8 @@
 
 # COMMAND ----------
 
-import os
 import dlt
-from dotenv import load_dotenv
+import config
 from pyspark.sql import functions as F
 from pyspark.sql.types import (
     DoubleType,
@@ -30,14 +29,11 @@ from pyspark.sql.types import (
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-# Try to load from .env, fallback to DLT spark configurations
-load_dotenv()
-
-KAFKA_BOOTSTRAP_SERVERS = os.getenv(
-    "KAFKA_BOOTSTRAP_SERVERS",
-    spark.conf.get("spark.cryptolake.kafka.bootstrap_servers", "localhost:9092")
+# Load from config.py (fallback to spark.conf for UI overrides if needed)
+KAFKA_BOOTSTRAP_SERVERS = spark.conf.get(
+    "spark.cryptolake.kafka.bootstrap_servers", config.KAFKA_BOOTSTRAP_SERVERS
 )
-KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "crypto-prices")
+KAFKA_TOPIC = spark.conf.get("spark.cryptolake.kafka.topic", config.KAFKA_TOPIC)
 
 # ---------------------------------------------------------------------------
 # Schema emitted by the CoinLore producer (producer.py)
