@@ -39,7 +39,7 @@ from pyspark.sql import functions as F
 # Rows that violate ANY expect_or_drop constraint are silently discarded.
 # Rows that violate an expect constraint are kept but flagged in the pipeline UI.
 @dlt.expect_or_drop("valid_price",      "price_usd IS NOT NULL AND price_usd > 0")
-@dlt.expect_or_drop("valid_symbol",     "symbol IS NOT NULL AND symbol != ''")
+@dlt.expect_or_drop("valid_symbol",     "symbol_upper IS NOT NULL AND symbol_upper != ''")
 @dlt.expect_or_drop("valid_market_cap", "market_cap_usd IS NOT NULL AND market_cap_usd > 0")
 @dlt.expect("non_negative_volume",      "volume24 IS NULL OR volume24 >= 0")
 def crypto_prices_clean():
