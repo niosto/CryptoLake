@@ -21,8 +21,7 @@ from pyspark.sql import functions as F
 # Silver DLT table
 # ---------------------------------------------------------------------------
 @dlt.table(
-    name="crypto_prices_clean",
-    schema="silver",
+    name="silver.crypto_prices",
     comment=(
         "Cleaned and enriched crypto-price stream. "
         "Invalid rows are dropped; duplicates are eliminated; "
@@ -42,7 +41,7 @@ from pyspark.sql import functions as F
 @dlt.expect_or_drop("valid_symbol",     "symbol_upper IS NOT NULL AND symbol_upper != ''")
 @dlt.expect_or_drop("valid_market_cap", "market_cap_usd IS NOT NULL AND market_cap_usd > 0")
 @dlt.expect("non_negative_volume",      "volume24 IS NULL OR volume24 >= 0")
-def crypto_prices_clean():
+def silver_crypto_prices():
     """
     Streaming transformation: bronze_crypto_prices → silver_crypto_prices.
 
@@ -55,7 +54,7 @@ def crypto_prices_clean():
     """
     return (
         # dlt.read_stream keeps the Silver table continuous / streaming
-        dlt.read_stream("crypto_prices")
+        dlt.read_stream("bronze.crypto_prices")
 
             # ── Deduplication ────────────────────────────────────────────────
             # DLT does not natively deduplicate streams; use dropDuplicates

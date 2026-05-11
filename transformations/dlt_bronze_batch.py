@@ -100,8 +100,7 @@ def _fetch_coincap(api_key: str, limit: int) -> pd.DataFrame:
 # Bronze – CoinGecko
 # ---------------------------------------------------------------------------
 @dlt.table(
-    name="coingecko",
-    schema="bronze",
+    name="bronze.coingecko",
     comment=(
         "Top-50 coins snapshot from CoinGecko /coins/markets. "
         "One full snapshot per pipeline run; Delta time travel provides history."
@@ -137,8 +136,7 @@ def coingecko():
 # Bronze – CoinCap
 # ---------------------------------------------------------------------------
 @dlt.table(
-    name="coincap",
-    schema="bronze",
+    name="bronze.coincap",
     comment=(
         "Top-50 coins snapshot from CoinCap /assets. "
         "One full snapshot per pipeline run; Delta time travel provides history."

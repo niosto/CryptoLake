@@ -58,8 +58,7 @@ COINLORE_SCHEMA = StructType(
 # Bronze DLT table
 # ---------------------------------------------------------------------------
 @dlt.table(
-    name="crypto_prices",
-    schema="bronze",
+    name="bronze.crypto_prices",
     comment=(
         "Raw crypto-price events streamed from the crypto-prices Kafka topic. "
         "One row per coin per poll cycle (~30 s). Kafka metadata is preserved "
@@ -71,7 +70,7 @@ COINLORE_SCHEMA = StructType(
         "delta.enableChangeDataFeed":      "true",
     },
 )
-def crypto_prices():
+def bronze_crypto_prices():
     """
     Structured Streaming source: Kafka → Delta Live Table (append-only).
 
