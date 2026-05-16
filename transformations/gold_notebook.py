@@ -20,6 +20,7 @@ from pyspark.sql.window import Window
 
 # COMMAND ----------
 
+spark.sql("USE CATALOG cryptolake")
 df_silver = spark.table("silver.crypto_enriched")
 print(f"Registros en silver.crypto_enriched: {df_silver.count()}")
 df_silver.printSchema()
